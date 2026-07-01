@@ -5,6 +5,6 @@
 node_modules/
 front/node_modules/
 front/dist/
-
+front
 # (Optionnel) Ignorer les logs
 *.log

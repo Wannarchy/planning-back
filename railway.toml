@@ -1,0 +1,7 @@
+[build]
+builder = "NIXPACKS"
+
+[deploy]
+startCommand = "node src/api/server.js"
+healthcheckPath = "/api/status"
+restartPolicyType = "ON_FAILURE"

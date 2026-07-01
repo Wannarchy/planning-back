@@ -25,6 +25,10 @@ app.get("/test", (req, res) => {
     res.json({ message: "Le serveur fonctionne !" });
 });
 
+app.get("/", (req, res) => {
+    res.status(200).json({ status: "OK", service: "planning-api" });
+});
+
 require("./cron.js");
 const ecouterNouvellesNotes = require("./realtime.js");
 ecouterNouvellesNotes();
@@ -290,8 +294,8 @@ app.get("/api/grades/:discord_id", async (req, res) => {
 
 const PORT = process.env.PORT || 8080;
 
-app.listen(PORT, () => {
-    console.log(`🚀 Serveur API démarré sur : http://localhost:${PORT}`);
+app.listen(PORT, "0.0.0.0", () => {
+    console.log(`🚀 Serveur API démarré sur le port ${PORT}`);
 });
 
 module.exports = app;
