@@ -3,6 +3,8 @@
 
 # Ignorer les dépendances node
 node_modules/
+front/node_modules/
+front/dist/
 
 # (Optionnel) Ignorer les logs
 *.log

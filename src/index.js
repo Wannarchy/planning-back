@@ -1,7 +1,6 @@
-require('dotenv').config();
-const { Client, Collection, Events ,GatewayIntentBits } = require("discord.js");
-const mongoose = require("mongoose");
 const path = require("node:path");
+require('dotenv').config({ path: path.join(__dirname, '.env') });
+const { Client, Collection, Events ,GatewayIntentBits } = require("discord.js");
 const fs = require("node:fs");
 
 
@@ -18,7 +17,7 @@ const client = new Client({
 
 //https://www.youtube.com/watch?v=dRZ9lBjknHU&ab_channel=NouvelleTechno
 client.commands = new Collection();
-const foldersPath = path.join( "commands")
+const foldersPath = path.join(__dirname, "commands")
 const commandFolders = fs.readdirSync(foldersPath)
 
 console.log("Dossier des commandes :", foldersPath);
@@ -62,14 +61,7 @@ for (const file of eventFiles) {
 	}
 }
 
-mongoose.connect(process.env.MONGODB_SRV, {
-  useNewUrlParser: true,
-  useUnifiedTopology:true,
-}).then(() =>{
-  console.log("Connecter DATABASE");
-}).catch((err) => {
-  console.log(err);
-});
+
 
 
 
