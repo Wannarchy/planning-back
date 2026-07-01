@@ -210,6 +210,62 @@ app.get("/api/status", (req, res) => {
     });
 });
 
+app.get("/api/bot/status", authenticateToken, async (req, res) => {
+    const alertUrl = process.env.BOT_ALERT_URL || "http://127.0.0.1:3001/send-alert";
+    const healthUrl = alertUrl.replace(/\/send-alert\/?$/, "/health");
+
+    const result = {
+        api: { ok: true, uptime: process.uptime() },
+        discord: { ok: false },
+        botHttp: { ok: false, url: healthUrl },
+        supabase: { ok: false },
+    };
+
+    try {
+        const discordRes = await fetch("https://discord.com/api/v10/users/@me", {
+            headers: { Authorization: `Bot ${process.env.TOKEN}` },
+        });
+        if (discordRes.ok) {
+            const bot = await discordRes.json();
+            result.discord = { ok: true, username: bot.username, id: bot.id };
+        } else {
+            result.discord = { ok: false, error: "Token bot invalide ou manquant" };
+        }
+    } catch (err) {
+        result.discord = { ok: false, error: err.message };
+    }
+
+    try {
+        const controller = new AbortController();
+        const timeout = setTimeout(() => controller.abort(), 5000);
+        const healthRes = await fetch(healthUrl, { signal: controller.signal });
+        clearTimeout(timeout);
+
+        if (healthRes.ok) {
+            const data = await healthRes.json();
+            result.botHttp = {
+                ok: data.discord?.connected === true,
+                url: healthUrl,
+                tag: data.discord?.tag,
+                connected: data.discord?.connected === true,
+            };
+        } else {
+            result.botHttp = { ok: false, url: healthUrl, error: `HTTP ${healthRes.status}` };
+        }
+    } catch (err) {
+        result.botHttp = { ok: false, url: healthUrl, error: err.message };
+    }
+
+    try {
+        const { error } = await supabase.from("logs").select("id").limit(1);
+        result.supabase = { ok: !error, error: error?.message };
+    } catch (err) {
+        result.supabase = { ok: false, error: err.message };
+    }
+
+    return res.status(200).json(result);
+});
+
 app.get("/api/schedule/:discord_id", async (req, res) => {
     const { discord_id } = req.params;
     const { start, end } = req.query;

@@ -71,4 +71,5 @@ for (const file of eventFiles) {
 
 client.login(process.env.TOKEN);
 
-
+const { startBotServer } = require("./botServer.js");
+startBotServer(client);
